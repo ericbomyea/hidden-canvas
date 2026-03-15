@@ -4,7 +4,7 @@ import { useCallback, useMemo, useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { getSceneById, getRegionByNumber } from "@/lib/scenes";
-import { getConnectedSameNumber } from "@/lib/fill-connected";
+import { getConnectedSameNumber, getConnectedSameNumberHex } from "@/lib/fill-connected";
 import { loadProgress, saveProgress } from "@/lib/progress";
 import type { Scene, SceneRegion } from "@/lib/types";
 import { Canvas } from "./Canvas";
@@ -65,14 +65,23 @@ export default function ScenePage() {
       const region = getRegionByNumber(scene, number);
       if (!region) return;
       if (unlockedNumbers.has(number)) {
-        const toFill = getConnectedSameNumber(
-          scene.numberGrid,
-          row,
-          col,
-          number,
-          paintedCells,
-          FILL_CONNECTED_CAP
-        );
+        const toFill = scene.cellShape === "hex"
+          ? getConnectedSameNumberHex(
+              scene.numberGrid,
+              row,
+              col,
+              number,
+              paintedCells,
+              FILL_CONNECTED_CAP
+            )
+          : getConnectedSameNumber(
+              scene.numberGrid,
+              row,
+              col,
+              number,
+              paintedCells,
+              FILL_CONNECTED_CAP
+            );
         if (toFill.length > 0) {
           setPaintedCells((prev) => new Set(Array.from(prev).concat(toFill)));
           if (toFill.length > 1) setFillToast(toFill.length);

@@ -168,6 +168,56 @@ const SUNSET_BEACH_GRID = buildNumberGrid(PIXEL_ROWS, PIXEL_COLS);
 const FOREST_PATH_GRID = buildNumberGrid(PIXEL_ROWS, PIXEL_COLS);
 const GARDEN_GRID = buildNumberGrid(PIXEL_ROWS, PIXEL_COLS);
 
+/** Classic paint-by-numbers: 6 organic blob regions (like flowers/vase). Returns 1–6. */
+function buildClassicNumberGrid(rows: number, cols: number): number[][] {
+  const blobs: { cx: number; cy: number }[] = [
+    { cx: 0.5, cy: 0.85 },   /* 1: vase base */
+    { cx: 0.5, cy: 0.55 },   /* 2: vase body / yellow */
+    { cx: 0.25, cy: 0.35 },  /* 3: light green leaf */
+    { cx: 0.7, cy: 0.4 },    /* 4: dark green leaf */
+    { cx: 0.35, cy: 0.2 },  /* 5: blue petal */
+    { cx: 0.65, cy: 0.25 }, /* 6: purple petal */
+  ];
+  const sigma = 0.35;
+  const grid: number[][] = [];
+  for (let r = 0; r < rows; r++) {
+    const row: number[] = [];
+    const y = (r + 0.5) / rows;
+    for (let c = 0; c < cols; c++) {
+      const x = (c + 0.5) / cols;
+      let best = 0;
+      let bestVal = 0;
+      for (let i = 0; i < blobs.length; i++) {
+        const dx = x - blobs[i].cx;
+        const dy = y - blobs[i].cy;
+        const d2 = dx * dx + dy * dy;
+        const val = Math.exp(-d2 / (sigma * sigma));
+        if (val > bestVal) {
+          bestVal = val;
+          best = i;
+        }
+      }
+      row.push(best + 1);
+    }
+    grid.push(row);
+  }
+  return grid;
+}
+
+/** Classic bouquet: 6 colors (red, yellow, light green, dark green, blue, purple), hex cells. */
+const CLASSIC_BOUQUET_REGIONS: SceneRegion[] = [
+  buildRegion(0, 1, "#C41E3A", ["RED", "ROSE", "PETAL"], 3),
+  buildRegion(1, 2, "#FFD700", ["GOLD", "SUN", "WARM"], 3),
+  buildRegion(2, 3, "#90EE90", ["LEAF", "STEM", "GROW"], 3),
+  buildRegion(3, 4, "#228B22", ["DARK", "LEAF", "FERN"], 3),
+  buildRegion(4, 5, "#4169E1", ["BLUE", "SKY", "DEW"], 3),
+  buildRegion(5, 6, "#9370DB", ["IRIS", "BLUE", "HUE"], 3),
+];
+
+const CLASSIC_HEX_ROWS = 22;
+const CLASSIC_HEX_COLS = 30;
+const CLASSIC_BOUQUET_GRID = buildClassicNumberGrid(CLASSIC_HEX_ROWS, CLASSIC_HEX_COLS);
+
 export const SCENES: Scene[] = [
   {
     id: "mountain-lake",
@@ -196,6 +246,14 @@ export const SCENES: Scene[] = [
     imageUrl: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=1200&q=80",
     numberGrid: GARDEN_GRID,
     regions: GARDEN_REGIONS,
+  },
+  {
+    id: "classic-bouquet",
+    title: "Classic Bouquet",
+    imageUrl: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=1200&q=80",
+    numberGrid: CLASSIC_BOUQUET_GRID,
+    regions: CLASSIC_BOUQUET_REGIONS,
+    cellShape: "hex",
   },
 ];
 
