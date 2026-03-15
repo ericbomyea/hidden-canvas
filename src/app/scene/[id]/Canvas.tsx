@@ -1,15 +1,8 @@
 "use client";
 
-import { useState, useCallback, useRef, useEffect, useMemo } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import type { Scene } from "@/lib/types";
 import { getRegionByNumber } from "@/lib/scenes";
-import {
-  getHexLayout,
-  hexCenter,
-  hexCorners,
-  hexAtPoint,
-  type HexLayout,
-} from "@/lib/hex-grid";
 import styles from "./scene.module.css";
 
 const BASE_WIDTH = 960;
@@ -49,19 +42,9 @@ export function Canvas({
     rect: DOMRect;
   } | null>(null);
 
-  const { imageUrl, numberGrid, cellShape } = scene;
+  const { imageUrl, numberGrid } = scene;
   const rows = numberGrid.length;
   const cols = numberGrid[0]?.length ?? 0;
-  const isHex = cellShape === "hex";
-
-  const hexLayout = useMemo<HexLayout | null>(() => {
-    if (!isHex) return null;
-    return getHexLayout(rows, cols, BASE_WIDTH, BASE_HEIGHT);
-  }, [isHex, rows, cols]);
-
-  const baseContentWidth = isHex && hexLayout ? hexLayout.contentWidth : BASE_WIDTH;
-  const baseContentHeight = isHex && hexLayout ? hexLayout.contentHeight : BASE_HEIGHT;
-
   const gridStyle = {
     gridTemplateColumns: `repeat(${cols}, 1fr)`,
     gridTemplateRows: `repeat(${rows}, 1fr)`,
@@ -75,8 +58,8 @@ export function Canvas({
     [scene]
   );
 
-  const contentWidth = Math.round(baseContentWidth * zoom);
-  const contentHeight = Math.round(baseContentHeight * zoom);
+  const contentWidth = Math.round(BASE_WIDTH * zoom);
+  const contentHeight = Math.round(BASE_HEIGHT * zoom);
 
   const handleTouchStart = useCallback(
     (e: React.TouchEvent) => {
@@ -198,8 +181,8 @@ export function Canvas({
           <div
             className={styles.canvasContent}
             style={{
-              width: baseContentWidth,
-              height: baseContentHeight,
+              width: BASE_WIDTH,
+              height: BASE_HEIGHT,
               transform: `scale(${zoom})`,
               transformOrigin: "0 0",
             }}
@@ -214,94 +197,39 @@ export function Canvas({
                   (e.target as HTMLImageElement).style.display = "none";
                 }}
               />
-              {isHex && hexLayout ? (
-                <svg
-                  className={styles.hexOverlay}
-                  width={hexLayout.contentWidth}
-                  height={hexLayout.contentHeight}
-                  onClick={(e) => {
-                    const target = e.currentTarget;
-                    const rect = target.getBoundingClientRect();
-                    const x = ((e.clientX - rect.left) / rect.width) * hexLayout.contentWidth;
-                    const y = ((e.clientY - rect.top) / rect.height) * hexLayout.contentHeight;
-                    const cell = hexAtPoint(hexLayout, x, y);
-                    if (cell) {
-                      const num = numberGrid[cell.row][cell.col];
-                      onCellTap(cell.row, cell.col, num);
-                    }
-                  }}
-                >
-                  {numberGrid.map((row, r) =>
-                    row.map((num, c) => {
-                      const key = `${r},${c}`;
-                      const painted = paintedCells.has(key);
-                      const unlocked = unlockedNumbers.has(num);
-                      const color = getColorForNumber(num);
-                      const { x: cx, y: cy } = hexCenter(hexLayout, r, c);
-                      const corners = hexCorners(hexLayout.radius);
-                      const points = corners
-                        .map((p) => `${cx + p.x},${cy + p.y}`)
-                        .join(" ");
-                      return (
-                        <g key={key}>
-                          <polygon
-                            points={points}
-                            fill={painted ? color : "rgba(0,0,0,0.5)"}
-                            stroke={unlocked && !painted ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.3)"}
-                            strokeWidth={1}
-                            style={{ cursor: "pointer" }}
-                          />
-                          {!painted && (
-                            <text
-                              x={cx}
-                              y={cy}
-                              textAnchor="middle"
-                              dominantBaseline="middle"
-                              className={styles.hexNumber}
-                            >
-                              {num}
-                            </text>
-                          )}
-                        </g>
-                      );
-                    })
-                  )}
-                </svg>
-              ) : (
-                <div
-                  className={styles.regionGrid}
-                  style={gridStyle}
-                >
-                  {numberGrid.map((row, r) =>
-                    row.map((num, c) => {
-                      const key = `${r},${c}`;
-                      const painted = paintedCells.has(key);
-                      const unlocked = unlockedNumbers.has(num);
-                      const color = getColorForNumber(num);
-                      return (
-                        <button
-                          key={key}
-                          type="button"
-                          className={`${styles.region} ${painted ? styles.regionPainted : ""} ${unlocked && !painted ? styles.regionUnlocked : ""}`}
-                          style={
-                            painted
-                              ? { backgroundColor: color }
-                              : undefined
-                          }
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onCellTap(r, c, num);
-                          }}
-                        >
-                          {!painted && (
-                            <span className={styles.regionNumber}>{num}</span>
-                          )}
-                        </button>
-                      );
-                    })
-                  )}
-                </div>
-              )}
+              <div
+                className={styles.regionGrid}
+                style={gridStyle}
+              >
+                {numberGrid.map((row, r) =>
+                  row.map((num, c) => {
+                    const key = `${r},${c}`;
+                    const painted = paintedCells.has(key);
+                    const unlocked = unlockedNumbers.has(num);
+                    const color = getColorForNumber(num);
+                    return (
+                      <button
+                        key={key}
+                        type="button"
+                        className={`${styles.region} ${painted ? styles.regionPainted : ""} ${unlocked && !painted ? styles.regionUnlocked : ""}`}
+                        style={
+                          painted
+                            ? { backgroundColor: color }
+                            : undefined
+                        }
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onCellTap(r, c, num);
+                        }}
+                      >
+                        {!painted && (
+                          <span className={styles.regionNumber}>{num}</span>
+                        )}
+                      </button>
+                    );
+                  })
+                )}
+              </div>
             </div>
           </div>
         </div>

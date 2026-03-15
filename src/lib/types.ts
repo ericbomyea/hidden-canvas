@@ -12,9 +12,6 @@ export interface SceneRegion {
   wordSearch: MiniWordSearch;
 }
 
-/** Cell shape for the canvas: square grid or hex grid (classic paint-by-numbers style). */
-export type CellShape = "square" | "hex";
-
 /** A full paint-by-numbers scene: one big image + grid of numbered cells. */
 export interface Scene {
   id: string;
@@ -25,8 +22,6 @@ export interface Scene {
   numberGrid: number[][];
   /** Region definitions: number → color + word search. */
   regions: SceneRegion[];
-  /** Render cells as squares (default) or hexagons for a softer, classic look. */
-  cellShape?: CellShape;
 }
 
 export interface GridCell {
