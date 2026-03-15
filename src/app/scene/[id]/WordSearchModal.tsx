@@ -124,7 +124,7 @@ export function WordSearchModal({
       >
         <div className={styles.modalHeader}>
           <h2 className={styles.modalTitle}>
-            Region {number} — find all words to unlock paint
+            Region {number} — find {wordList.length} word{wordList.length !== 1 ? "s" : ""} to unlock paint
           </h2>
           <button
             type="button"
@@ -183,7 +183,7 @@ export function WordSearchModal({
         </div>
 
         <p className={styles.modalHint}>
-          Tap and drag to select a word. Find all words to paint this region.
+          Tap and drag to select a word (horizontal, vertical, or diagonal). Find all words to paint this region.
         </p>
       </div>
     </div>
