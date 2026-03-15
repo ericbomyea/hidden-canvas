@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useRef, useState, useEffect } from "react";
 import { getWordFromList } from "@/lib/word-search";
 import type { SceneRegion } from "@/lib/types";
 import styles from "./scene.module.css";
@@ -120,6 +120,53 @@ export function WordSearchModal({
   const defaultZoom = gridSize >= 12 ? 0.45 : gridSize >= 9 ? 0.6 : 1;
   const [gridZoom, setGridZoom] = useState(defaultZoom);
 
+  const gridWrapRef = useRef<HTMLDivElement>(null);
+  const panStartRef = useRef<{ x: number; y: number; scrollLeft: number; scrollTop: number } | null>(null);
+
+  useEffect(() => {
+    const el = gridWrapRef.current;
+    if (!el) return;
+
+    const getCenter = (touches: TouchList) => ({
+      x: (touches[0].clientX + touches[1].clientX) / 2,
+      y: (touches[0].clientY + touches[1].clientY) / 2,
+    });
+
+    const onTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 2) {
+        panStartRef.current = {
+          ...getCenter(e.touches),
+          scrollLeft: el.scrollLeft,
+          scrollTop: el.scrollTop,
+        };
+      }
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      if (e.touches.length === 2 && panStartRef.current) {
+        e.preventDefault();
+        const center = getCenter(e.touches);
+        el.scrollLeft = panStartRef.current.scrollLeft + (panStartRef.current.x - center.x);
+        el.scrollTop = panStartRef.current.scrollTop + (panStartRef.current.y - center.y);
+      }
+    };
+
+    const onTouchEndInner = (e: TouchEvent) => {
+      if (e.touches.length < 2) panStartRef.current = null;
+    };
+
+    el.addEventListener("touchstart", onTouchStart, { passive: true });
+    el.addEventListener("touchmove", onTouchMove, { passive: false });
+    el.addEventListener("touchend", onTouchEndInner);
+    el.addEventListener("touchcancel", onTouchEndInner);
+    return () => {
+      el.removeEventListener("touchstart", onTouchStart);
+      el.removeEventListener("touchmove", onTouchMove);
+      el.removeEventListener("touchend", onTouchEndInner);
+      el.removeEventListener("touchcancel", onTouchEndInner);
+    };
+  }, []);
+
   return (
     <div className={styles.modalOverlay} onClick={onClose}>
       <div
@@ -176,7 +223,7 @@ export function WordSearchModal({
           })}
         </div>
 
-        <div className={styles.modalGridWrap}>
+        <div ref={gridWrapRef} className={styles.modalGridWrap}>
           <div
             className={styles.modalGrid}
             onPointerDown={handlePointerDown}
@@ -212,7 +259,7 @@ export function WordSearchModal({
         </div>
 
         <p className={styles.modalHint}>
-          Tap and drag to select a word (horizontal, vertical, or diagonal). Find all words to paint this region.
+          Tap and drag to select a word (horizontal, vertical, or diagonal). On large grids: zoom out to see all, then two-finger drag to pan. Find all words to paint this region.
         </p>
       </div>
     </div>

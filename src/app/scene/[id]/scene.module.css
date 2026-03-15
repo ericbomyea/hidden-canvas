@@ -6,6 +6,8 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  /* Reduce accidental pull-to-refresh on mobile */
+  overscroll-behavior-y: contain;
 }
 
 .header {
@@ -164,6 +166,12 @@
   min-width: 3.5rem;
 }
 
+.canvasHint {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
 .canvasWrap {
   flex: 1;
   min-height: min(70vh, 28rem);
@@ -171,31 +179,26 @@
   border-radius: var(--radius-lg);
   border: 2px solid var(--color-border);
   background: var(--color-bg);
-  cursor: grab;
-  touch-action: none;
   -webkit-overflow-scrolling: touch;
-}
-
-.canvasWrap:active {
-  cursor: grabbing;
+  /* Native scroll = pan; avoid triggering pull-to-refresh */
+  overscroll-behavior: contain;
+  touch-action: pan-x pan-y;
 }
 
 .canvasInner {
-  will-change: transform;
-  width: 100%;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.canvasContent {
+  position: relative;
+  flex-shrink: 0;
 }
 
 .imageWrap {
   position: relative;
   width: 100%;
-  max-width: 960px;
-  min-width: 280px;
-  aspect-ratio: 4 / 3;
-  flex-shrink: 0;
+  height: 100%;
   background: linear-gradient(180deg, #87CEEB 0%, #B0C4DE 25%, #7EB8DA 50%, #4A7C59 75%, #8B7355 100%);
 }
 
@@ -374,7 +377,9 @@
   padding: 0.5rem 0;
   display: flex;
   justify-content: center;
-  max-height: min(50vh, 20rem);
+  align-items: flex-start;
+  height: min(55vh, 22rem);
+  max-height: min(55vh, 22rem);
   -webkit-overflow-scrolling: touch;
 }
 

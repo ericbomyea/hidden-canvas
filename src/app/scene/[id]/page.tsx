@@ -5,12 +5,22 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { getSceneById, getRegionByNumber } from "@/lib/scenes";
 import { getConnectedSameNumber } from "@/lib/fill-connected";
+import { loadProgress, saveProgress } from "@/lib/progress";
 import type { Scene, SceneRegion } from "@/lib/types";
 import { Canvas } from "./Canvas";
 import { WordSearchModal } from "./WordSearchModal";
 import styles from "./scene.module.css";
 
 const FILL_CONNECTED_CAP = 15;
+
+function getInitialProgress(sceneId: string) {
+  const saved = loadProgress(sceneId);
+  if (!saved) return { unlocked: new Set<number>(), painted: new Set<string>() };
+  return {
+    unlocked: new Set<number>(saved.unlockedNumbers),
+    painted: new Set<string>(saved.paintedCells),
+  };
+}
 
 export default function ScenePage() {
   const params = useParams();
@@ -19,15 +29,27 @@ export default function ScenePage() {
     [params.id]
   );
 
-  /** Numbers whose word search has been completed (user can now paint those cells). */
+  const sceneId = scene?.id ?? "";
   const [unlockedNumbers, setUnlockedNumbers] = useState<Set<number>>(
-    () => new Set()
+    () => (sceneId ? getInitialProgress(sceneId).unlocked : new Set())
   );
-  /** Painted cells: "row,col" */
-  const [paintedCells, setPaintedCells] = useState<Set<string>>(() => new Set());
+  const [paintedCells, setPaintedCells] = useState<Set<string>>(() =>
+    sceneId ? getInitialProgress(sceneId).painted : new Set()
+  );
   const [activeRegion, setActiveRegion] = useState<SceneRegion | null>(null);
-  /** Streak toast: show "N filled!" when filling multiple cells at once */
   const [fillToast, setFillToast] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!sceneId) return;
+    const { unlocked, painted } = getInitialProgress(sceneId);
+    setUnlockedNumbers(unlocked);
+    setPaintedCells(painted);
+  }, [sceneId]);
+
+  useEffect(() => {
+    if (!sceneId) return;
+    saveProgress(sceneId, unlockedNumbers, paintedCells);
+  }, [sceneId, unlockedNumbers, paintedCells]);
 
   useEffect(() => {
     if (fillToast === null) return;

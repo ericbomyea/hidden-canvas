@@ -5,27 +5,39 @@ import { SCENES } from "@/lib/scenes";
 import styles from "./page.module.css";
 
 export default function Home() {
-  const scene = SCENES[0];
-
   return (
     <main className={styles.page}>
       <div className={styles.hero}>
         <h1 className={styles.title}>Hidden Canvas</h1>
         <p className={styles.tagline}>
-          A paint-by-numbers scene. Zoom in, tap a number, and solve a word
-          search to unlock that region and paint it.
+          A paint-by-numbers scene. Pick an image, tap numbers to solve word
+          searches, then paint the canvas.
         </p>
-        <Link
-          href={scene ? `/scene/${scene.id}` : "/"}
-          className={styles.cta}
-        >
-          Start Painting
-        </Link>
       </div>
+
+      <section className={styles.sceneGrid} aria-label="Choose a scene">
+        {SCENES.map((scene) => (
+          <Link
+            key={scene.id}
+            href={`/scene/${scene.id}`}
+            className={styles.sceneCard}
+          >
+            <span className={styles.sceneThumb}>
+              <img
+                src={scene.imageUrl}
+                alt=""
+                className={styles.sceneThumbImg}
+              />
+            </span>
+            <span className={styles.sceneTitle}>{scene.title}</span>
+          </Link>
+        ))}
+      </section>
+
       <p className={styles.hint}>
-        You’ll see a large image with numbered regions. Tap any number to open
-        a small word search. Find all the words to unlock the paint for that
-        region.
+        Tap a scene to start. You’ll see a large image with numbered regions.
+        Tap any number to open a word search; find all the words to unlock that
+        color, then tap cells to paint.
       </p>
     </main>
   );
