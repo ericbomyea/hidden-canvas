@@ -1,0 +1,312 @@
+.container {
+  min-height: 100vh;
+  padding: 1rem;
+  max-width: 56rem;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.header {
+  flex-shrink: 0;
+}
+
+.back {
+  display: inline-block;
+  font-size: 0.9375rem;
+  color: var(--color-text-muted);
+  margin-bottom: 0.5rem;
+  min-height: auto;
+  padding: 0.5rem 0;
+}
+
+.back:hover {
+  color: var(--color-accent);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.subtitle {
+  font-size: 0.9375rem;
+  color: var(--color-text-muted);
+}
+
+/* Canvas */
+.canvasSection {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.zoomControls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.zoomBtn {
+  width: 2.5rem;
+  height: 2.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius);
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.zoomBtn:hover {
+  border-color: var(--color-accent-soft);
+  background: var(--color-highlight);
+}
+
+.zoomLabel {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  min-width: 3.5rem;
+}
+
+.canvasWrap {
+  flex: 1;
+  min-height: min(70vh, 28rem);
+  overflow: auto;
+  border-radius: var(--radius-lg);
+  border: 2px solid var(--color-border);
+  background: var(--color-bg);
+  cursor: grab;
+  touch-action: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.canvasWrap:active {
+  cursor: grabbing;
+}
+
+.canvasInner {
+  will-change: transform;
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.imageWrap {
+  position: relative;
+  width: 100%;
+  max-width: 960px;
+  min-width: 280px;
+  aspect-ratio: 4 / 3;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, #87CEEB 0%, #B0C4DE 25%, #7EB8DA 50%, #4A7C59 75%, #8B7355 100%);
+}
+
+.sceneImage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  background: var(--color-bg);
+  opacity: 0.35;
+}
+
+
+/* Pixel-art grid: 1px gap so squares read as pixels */
+.regionGrid {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  gap: 1px;
+  padding: 0;
+}
+
+.region {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  min-width: 0;
+  min-height: 0;
+  background: rgba(0, 0, 0, 0.5);
+  border: none;
+  border-radius: 0;
+  transition: background-color 0.2s ease;
+}
+
+.region:hover:not(.regionPainted) {
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.regionUnlocked:hover:not(.regionPainted) {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.regionPainted {
+  /* Filled with region color via inline style */
+}
+
+.regionNumber {
+  font-family: var(--font-display);
+  font-size: clamp(0.5rem, 2.5vw, 0.75rem);
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.95);
+  text-shadow: 0 0 1px rgba(0, 0, 0, 0.8);
+  line-height: 1;
+}
+
+/* Modal */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 1rem;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  max-width: 22rem;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+  animation: slideUp 0.25s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modalHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem 1.25rem 0;
+}
+
+.modalTitle {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-text);
+  line-height: 1.3;
+}
+
+.modalClose {
+  flex-shrink: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--color-text-muted);
+  border-radius: var(--radius);
+  transition: color 0.2s, background 0.2s;
+}
+
+.modalClose:hover {
+  color: var(--color-text);
+  background: var(--color-bg);
+}
+
+.modalWordList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  padding: 1rem 1.25rem 0;
+}
+
+.modalWord {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+.modalWordFound {
+  color: var(--color-accent);
+  text-decoration: line-through;
+}
+
+.modalGrid {
+  display: grid;
+  gap: 2px;
+  padding: 1rem 1.25rem;
+  background: var(--color-bg);
+  border-radius: var(--radius);
+  margin: 1rem 1.25rem 0;
+  user-select: none;
+  touch-action: none;
+}
+
+.modalCell {
+  aspect-ratio: 1;
+  min-width: 2rem;
+  min-height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-text);
+  background: var(--color-surface);
+  border-radius: 4px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.modalCellSelected {
+  background: var(--color-accent);
+  color: var(--color-surface);
+}
+
+.modalCellFound {
+  background: rgba(74, 124, 89, 0.15);
+  outline: 2px solid var(--color-accent);
+  outline-offset: -1px;
+  box-sizing: border-box;
+}
+
+.modalCellFound.modalCellSelected {
+  outline-color: var(--color-surface);
+}
+
+.modalHint {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  padding: 0 1.25rem 1.25rem;
+  line-height: 1.4;
+}
