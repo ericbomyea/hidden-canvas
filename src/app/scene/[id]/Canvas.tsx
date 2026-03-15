@@ -8,7 +8,7 @@ import styles from "./scene.module.css";
 const PAN_FACTOR = 0.85;
 const PAN_THRESHOLD_PX = 8;
 const ZOOM_MIN = 0.75;
-const ZOOM_MAX = 2;
+const ZOOM_MAX = 4;
 
 function distance(a: { x: number; y: number }, b: { x: number; y: number }): number {
   return Math.hypot(b.x - a.x, b.y - a.y);
@@ -192,7 +192,7 @@ export function Canvas({
         <button
           type="button"
           className={styles.zoomBtn}
-          onClick={() => setZoom((z) => Math.min(2, z + 0.15))}
+          onClick={() => setZoom((z) => Math.min(ZOOM_MAX, z + 0.15))}
           aria-label="Zoom in"
         >
           +

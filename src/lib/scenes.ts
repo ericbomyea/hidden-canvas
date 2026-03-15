@@ -64,11 +64,18 @@ const MOUNTAIN_LAKE_REGIONS: SceneRegion[] = [
   buildRegion(9, 10, "#E8D5B7", ["SAND", "SHORE", "PALE"], 3),
   buildRegion(10, 11, "#7EB8DA", EPIC_WORDS, 25),
   buildRegion(11, 12, "#4A7C59", ["GROW", "SEED", "SOIL", "LAWN", "DEW"], 5),
+  buildRegion(12, 13, "#9BB8D4", ["CLOUD", "MIST", "HAZE"], 3),
+  buildRegion(13, 14, "#6B8E9F", ["WAVE", "DEEP", "COOL"], 3),
+  buildRegion(14, 15, "#5C8A6A", ["FERN", "MOSS", "DEW"], 3),
+  buildRegion(15, 16, "#A08060", ["CLAY", "SOIL", "DUST"], 3),
+  buildRegion(16, 17, "#E8C547", ["DAWN", "GLOW", "RAY"], 3),
+  buildRegion(17, 18, "#7A9E7E", ["REED", "RUSH", "BOG"], 3),
 ];
 
-/** Pixel-art paint-by-numbers: large grid, 4:3 ratio so cells stay square. 24×32 = 768 cells. */
+/** Pixel-art: 18 numbers, more even distribution so no number dominates. 24×32 = 768 cells. */
 const PIXEL_ROWS = 24;
 const PIXEL_COLS = 32;
+const NUM_COLORS = 18;
 
 function wave(row: number, col: number, scale: number): number {
   const x = col * scale;
@@ -80,24 +87,12 @@ function mountainLakeNumberGrid(): number[][] {
   const grid: number[][] = [];
   for (let r = 0; r < PIXEL_ROWS; r++) {
     const row: number[] = [];
-    const x = (r + 1) * 0.4 + wave(r, 0, 0.25) * 4;
     for (let c = 0; c < PIXEL_COLS; c++) {
-      const wobble = wave(r, c, 0.4) * 3;
-      const horizon = 5 + x + wobble;
-      const shore = 13 + wave(r, c, 0.3) * 4;
-      const trees = 18 + wave(r, c, 0.35) * 3;
-      // Landscape bands with horizontal variation (pixel-art “shape”)
-      let n: number;
-      if (r < horizon) {
-        n = 1 + Math.floor(wave(r, c, 0.5) * 2) % 2;
-      } else if (r < shore) {
-        n = 3 + Math.floor(wave(r, c, 0.45) * 2) % 2;
-      } else if (r < trees) {
-        n = 5 + Math.floor(wave(r, c, 0.4) * 4) % 4;
-      } else {
-        n = 9 + Math.floor(wave(r, c, 0.35) * 4) % 4;
-      }
-      row.push(Math.min(12, Math.max(1, n)));
+      const rowProgress = r / PIXEL_ROWS;
+      const wobble = wave(r, c, 0.4) * 4;
+      const band = (rowProgress * NUM_COLORS + wobble + (c / PIXEL_COLS) * 1.5) % NUM_COLORS;
+      const n = 1 + Math.floor((band + NUM_COLORS) % NUM_COLORS);
+      row.push(Math.min(NUM_COLORS, Math.max(1, n)));
     }
     grid.push(row);
   }

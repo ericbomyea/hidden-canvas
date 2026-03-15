@@ -37,6 +37,91 @@
   color: var(--color-text-muted);
 }
 
+/* Painter's palette — solved numbers and colors */
+.palette {
+  flex-shrink: 0;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 0.75rem 1rem;
+}
+
+.paletteLabel {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.paletteWells {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.paletteWell {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--color-border);
+  background: var(--color-bg);
+  transition: transform 0.15s ease, border-color 0.2s, box-shadow 0.2s;
+}
+
+.paletteWell:hover:not(.paletteWellUnlocked) {
+  border-color: var(--color-accent-soft);
+  transform: scale(1.08);
+}
+
+.paletteWellUnlocked {
+  border-color: rgba(0, 0, 0, 0.2);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+.paletteWellNumber {
+  font-family: var(--font-display);
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.paletteWellUnlocked .paletteWellNumber {
+  color: rgba(255, 255, 255, 0.95);
+  text-shadow: 0 0 1px rgba(0, 0, 0, 0.4);
+}
+
+/* Fill streak toast */
+.fillToast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.5rem 1rem;
+  background: var(--color-accent);
+  color: var(--color-surface);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 50;
+  animation: toastIn 0.2s ease;
+}
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+  }
+}
+
 /* Canvas */
 .canvasSection {
   position: relative;
@@ -244,6 +329,55 @@
   background: var(--color-bg);
 }
 
+.modalZoomRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem 0;
+}
+
+.modalZoomLabel {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  margin-right: 0.25rem;
+}
+
+.modalZoomBtn {
+  width: 2rem;
+  height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-text);
+  background: var(--color-bg);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius);
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.modalZoomBtn:hover {
+  border-color: var(--color-accent-soft);
+  background: var(--color-highlight);
+}
+
+.modalZoomPct {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  min-width: 2.5rem;
+}
+
+.modalGridWrap {
+  overflow: auto;
+  margin: 1rem 1.25rem 0;
+  padding: 0.5rem 0;
+  display: flex;
+  justify-content: center;
+  max-height: min(50vh, 20rem);
+  -webkit-overflow-scrolling: touch;
+}
+
 .modalWordList {
   display: flex;
   flex-wrap: wrap;
@@ -265,12 +399,13 @@
 .modalGrid {
   display: grid;
   gap: 2px;
-  padding: 1rem 1.25rem;
+  padding: 0.75rem;
   background: var(--color-bg);
   border-radius: var(--radius);
-  margin: 1rem 1.25rem 0;
   user-select: none;
   touch-action: none;
+  width: max-content;
+  height: max-content;
 }
 
 .modalCell {

@@ -116,6 +116,10 @@ export function WordSearchModal({
   const rows = grid.length;
   const cols = grid[0]?.length ?? 0;
 
+  const gridSize = Math.max(rows, cols);
+  const defaultZoom = gridSize >= 12 ? 0.45 : gridSize >= 9 ? 0.6 : 1;
+  const [gridZoom, setGridZoom] = useState(defaultZoom);
+
   return (
     <div className={styles.modalOverlay} onClick={onClose}>
       <div
@@ -136,6 +140,27 @@ export function WordSearchModal({
           </button>
         </div>
 
+        <div className={styles.modalZoomRow}>
+          <span className={styles.modalZoomLabel}>Zoom grid</span>
+          <button
+            type="button"
+            className={styles.modalZoomBtn}
+            onClick={() => setGridZoom((z) => Math.max(0.35, z - 0.1))}
+            aria-label="Zoom out"
+          >
+            −
+          </button>
+          <span className={styles.modalZoomPct}>{Math.round(gridZoom * 100)}%</span>
+          <button
+            type="button"
+            className={styles.modalZoomBtn}
+            onClick={() => setGridZoom((z) => Math.min(1.2, z + 0.1))}
+            aria-label="Zoom in"
+          >
+            +
+          </button>
+        </div>
+
         <div className={styles.modalWordList}>
           {wordList.map((w) => {
             const upper = w.toUpperCase().replace(/\s/g, "");
@@ -151,19 +176,22 @@ export function WordSearchModal({
           })}
         </div>
 
-        <div
-          className={styles.modalGrid}
-          onPointerDown={handlePointerDown}
-          onPointerMove={handlePointerMove}
-          onPointerUp={handlePointerUp}
-          onPointerLeave={handlePointerUp}
-          onPointerCancel={handlePointerUp}
-          style={{
-            gridTemplateColumns: `repeat(${cols}, 1fr)`,
-            gridTemplateRows: `repeat(${rows}, 1fr)`,
-          }}
-        >
-          {grid.map((row, r) =>
+        <div className={styles.modalGridWrap}>
+          <div
+            className={styles.modalGrid}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onPointerLeave={handlePointerUp}
+            onPointerCancel={handlePointerUp}
+            style={{
+              gridTemplateColumns: `repeat(${cols}, 1fr)`,
+              gridTemplateRows: `repeat(${rows}, 1fr)`,
+              transform: `scale(${gridZoom})`,
+              transformOrigin: "top center",
+            }}
+          >
+            {grid.map((row, r) =>
             row.map((letter, c) => {
               const key = `${r},${c}`;
               const isSelected = selectionSet.has(key);
@@ -180,6 +208,7 @@ export function WordSearchModal({
               );
             })
           )}
+          </div>
         </div>
 
         <p className={styles.modalHint}>
