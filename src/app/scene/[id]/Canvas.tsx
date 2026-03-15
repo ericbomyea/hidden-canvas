@@ -7,7 +7,7 @@ import styles from "./scene.module.css";
 
 const BASE_WIDTH = 960;
 const BASE_HEIGHT = 720;
-const ZOOM_MIN = 0.75;
+const ZOOM_MIN = 0.35; /* zoom out to 35% so whole image fits on mobile */
 const ZOOM_MAX = 3;
 
 interface CanvasProps {
